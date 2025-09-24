@@ -16,3 +16,4 @@ class AppRoutes {
     home: (context) => HomeScreen(),
   };
 }
+

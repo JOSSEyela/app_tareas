@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'App Tareas',
         initialRoute: AppRoutes.login,
-        routes: AppRoutes.routes,
+        routes: AppRoutes.routes, 
       ),
     );
   }
