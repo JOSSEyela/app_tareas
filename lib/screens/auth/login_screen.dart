@@ -1,3 +1,4 @@
+import 'package:app_tareas_prueba/routes.dart';
 import 'package:flutter/material.dart';
 
 import '../../widgets/custom_button.dart';
@@ -80,6 +81,7 @@ class LoginScreen extends StatelessWidget {
                       GestureDetector(
                         onTap: () {
                           // Navegación futura a la pantalla de registro
+                          Navigator.pushNamed(context, AppRoutes.register);
                         },
                         child: const Text(
                           "Regístrate",
