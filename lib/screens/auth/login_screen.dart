@@ -1,25 +1,41 @@
 import 'package:app_tareas_prueba/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
 
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_text_field.dart';
+import '../../providers/theme_provider.dart';
 
 class LoginScreen extends StatelessWidget {
   LoginScreen({super.key});
 
-  // Controladores para los campos de texto
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
+
     return Scaffold(
+      appBar: AppBar(
+        title: const Text("Iniciar sesión"),
+        actions: [
+          Consumer<ThemeProvider>(
+            builder: (context, theme, _) => IconButton(
+              tooltip: theme.isDark ? 'Modo claro' : 'Modo oscuro',
+              icon: Icon(theme.isDark ? Icons.dark_mode : Icons.light_mode),
+              onPressed: () => theme.toggle(),
+            ),
+          ),
+        ],
+      ),
       body: Container(
         width: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color.fromARGB(147, 255, 255, 255), Color.fromARGB(146, 255, 255, 255)],
+            colors: [cs.surface, cs.surfaceVariant],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -31,29 +47,18 @@ class LoginScreen extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Logo o título
-                  const Icon(Icons.lock, size: 80, color: Color.fromARGB(255, 123, 60, 224)),
+                  Icon(Icons.lock, size: 80, color: cs.primary),
                   const SizedBox(height: 20),
-                  const Text(
-                    "Bienvenido",
-                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-                  ),
+                  Text("Bienvenido", style: tt.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
                   const SizedBox(height: 8),
-                  const Text(
-                    "Inicia sesión para continuar",
-                    style: TextStyle(fontSize: 16, color: Colors.black54),
-                  ),
+                  Text("Inicia sesión para continuar", style: tt.bodyMedium?.copyWith(color: cs.onSurfaceVariant)),
                   const SizedBox(height: 40),
-
-                  // Campo de email
                   CustomTextField(
                     label: "Correo electrónico",
                     icon: Icons.email,
                     controller: emailController,
                   ),
                   const SizedBox(height: 20),
-
-                  // Campo de contraseña
                   CustomTextField(
                     label: "Contraseña",
                     icon: Icons.lock,
@@ -61,63 +66,45 @@ class LoginScreen extends StatelessWidget {
                     controller: passwordController,
                   ),
                   const SizedBox(height: 30),
+                  CustomButton(
+                    text: "Iniciar Sesión",
+                    onPressed: () async {
+                      final email = emailController.text.trim();
+                      final password = passwordController.text.trim();
 
-                  // Botón de iniciar sesión
-                 CustomButton(
-                  text: "Iniciar Sesión",
-                  onPressed: () async {
-                    final email = emailController.text.trim();
-                    final password = passwordController.text.trim();
+                      if (email.isEmpty || password.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text("Por favor ingresa todos los campos")),
+                        );
+                        return;
+                      }
 
-    if (email.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Por favor ingresa todos los campos")),
-      );
-      return;
-    }
-
-    try {
-      // Autenticación con Firebase
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-
-      // Si funciona, navegar a la pantalla principal
-      Navigator.pushReplacementNamed(context, AppRoutes.home);
-
-    } on FirebaseAuthException catch (e) {
-      String mensaje = "Ocurrió un error";
-      if (e.code == 'user-not-found') {
-        mensaje = "Usuario no encontrado";
-      } else if (e.code == 'wrong-password') {
-        mensaje = "Contraseña incorrecta";
-      }
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(mensaje)),
-      );
-    }
-  },
-),
+                      try {
+                        await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
+                        Navigator.pushReplacementNamed(context, AppRoutes.home);
+                      } on FirebaseAuthException catch (e) {
+                        String mensaje = "Ocurrió un error";
+                        if (e.code == 'user-not-found') {
+                          mensaje = "Usuario no encontrado";
+                        } else if (e.code == 'wrong-password') {
+                          mensaje = "Contraseña incorrecta";
+                        }
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(mensaje)));
+                      }
+                    },
+                  ),
                   const SizedBox(height: 20),
-
-                  // Link de registro
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text("¿No tienes cuenta? "),
+                      Text("¿No tienes cuenta? ", style: tt.bodyMedium),
                       GestureDetector(
                         onTap: () {
-                          // Navegación futura a la pantalla de registro
                           Navigator.pushNamed(context, AppRoutes.register);
                         },
-                        child: const Text(
+                        child: Text(
                           "Regístrate",
-                          style: TextStyle(
-                            color: Color.fromARGB(255, 123, 60, 224),
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: tt.bodyMedium?.copyWith(color: cs.primary, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ],

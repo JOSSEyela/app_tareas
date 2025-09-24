@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_text_field.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/theme_provider.dart';
 
 class RegisterScreen extends StatelessWidget {
   RegisterScreen({super.key});
@@ -14,16 +16,27 @@ class RegisterScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
+    final cs = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
 
     return Scaffold(
+      appBar: AppBar(
+        title: const Text("Crear cuenta"),
+        actions: [
+          Consumer<ThemeProvider>(
+            builder: (context, theme, _) => IconButton(
+              tooltip: theme.isDark ? 'Modo claro' : 'Modo oscuro',
+              icon: Icon(theme.isDark ? Icons.dark_mode : Icons.light_mode),
+              onPressed: () => theme.toggle(),
+            ),
+          ),
+        ],
+      ),
       body: Container(
         width: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [
-              Color.fromARGB(147, 255, 255, 255),
-              Color.fromARGB(146, 255, 255, 255),
-            ],
+            colors: [cs.surface, cs.surfaceVariant],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -35,37 +48,24 @@ class RegisterScreen extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.person_add,
-                      size: 80, color: Color.fromARGB(255, 123, 60, 224)),
+                  Icon(Icons.person_add, size: 80, color: cs.primary),
                   const SizedBox(height: 20),
-                  const Text(
-                    "Crear cuenta",
-                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-                  ),
+                  Text("Crear cuenta", style: tt.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
                   const SizedBox(height: 8),
-                  const Text(
-                    "Regístrate para continuar",
-                    style: TextStyle(fontSize: 16, color: Colors.black54),
-                  ),
+                  Text("Regístrate para continuar", style: tt.bodyMedium?.copyWith(color: cs.onSurfaceVariant)),
                   const SizedBox(height: 40),
-
-                  // Campo de nombre de usuario
                   CustomTextField(
                     label: "Nombre de usuario",
                     icon: Icons.person,
                     controller: usernameController,
                   ),
                   const SizedBox(height: 20),
-
-                  // Campo de correo
                   CustomTextField(
                     label: "Correo electrónico",
                     icon: Icons.email,
                     controller: emailController,
                   ),
                   const SizedBox(height: 20),
-
-                  // Campo de contraseña
                   CustomTextField(
                     label: "Contraseña",
                     icon: Icons.lock,
@@ -73,8 +73,6 @@ class RegisterScreen extends StatelessWidget {
                     controller: passwordController,
                   ),
                   const SizedBox(height: 30),
-
-                  // Botón de registro
                   CustomButton(
                     text: "Registrarse",
                     onPressed: () async {
@@ -84,8 +82,6 @@ class RegisterScreen extends StatelessWidget {
                           passwordController.text.trim(),
                           usernameController.text.trim(),
                         );
-
-                        // Aquí más adelante guardaremos el "username" en Firestore
                         Navigator.pushReplacementNamed(context, "/login");
                       } catch (e) {
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -95,22 +91,17 @@ class RegisterScreen extends StatelessWidget {
                     },
                   ),
                   const SizedBox(height: 20),
-
-                  // Link a login
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text("¿Ya tienes cuenta? "),
+                      Text("¿Ya tienes cuenta? ", style: tt.bodyMedium),
                       GestureDetector(
                         onTap: () {
                           Navigator.pushReplacementNamed(context, "/login");
                         },
-                        child: const Text(
+                        child: Text(
                           "Inicia sesión",
-                          style: TextStyle(
-                            color: Color.fromARGB(255, 123, 60, 224),
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: tt.bodyMedium?.copyWith(color: cs.primary, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ],
