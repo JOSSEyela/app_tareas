@@ -8,11 +8,15 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    // 🔹 Con listen:true porque queremos redibujar si userData cambia
+    final authProvider = Provider.of<AuthProvider>(context);
+
+    // 🔹 Obtenemos el modelo de usuario
+    final userData = authProvider.userData;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Inicio"),
+        title: Text("Inicio (${userData?.username ?? ''})"), // ejemplo usando username
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
@@ -29,10 +33,20 @@ class HomeScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: const Center(
-        child: Text(
-          "Bienvenido a App Tareas",
-          style: TextStyle(fontSize: 20),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              "Bienvenido ${userData?.username ?? 'Usuario'}",
+              style: const TextStyle(fontSize: 20),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              "Email: ${userData?.email ?? ''}",
+              style: const TextStyle(fontSize: 16),
+            ),
+          ],
         ),
       ),
     );
