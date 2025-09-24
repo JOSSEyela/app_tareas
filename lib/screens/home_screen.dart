@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../models/task.dart';
 import '../providers/task_provider.dart';
+import '../providers/theme_provider.dart';
 import '../providers/auth_provider.dart';
 import '../routes.dart';
 import 'profile_screen.dart';
@@ -17,10 +19,10 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
 
-  final List<Widget> _screens = [
-    const TaskListHome(), // Lista de tareas en el inicio
-    const TasksScreen(),  // Pantalla completa de tareas
-    const ProfileScreen(),// Perfil y configuración de tema
+  final List<Widget> _screens = const [
+    TaskListHome(),
+    TasksScreen(),
+    ProfileScreen(),
   ];
 
   void _onItemTapped(int index) {
@@ -31,20 +33,25 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Mi App de Tareas'),
         actions: [
+          Consumer<ThemeProvider>(
+            builder: (context, theme, _) => IconButton(
+              tooltip: theme.isDark ? 'Modo claro' : 'Modo oscuro',
+              icon: Icon(theme.isDark ? Icons.dark_mode : Icons.light_mode),
+              onPressed: () => theme.toggle(),
+            ),
+          ),
           IconButton(
             icon: const Icon(Icons.logout),
             tooltip: 'Cerrar sesión',
             onPressed: () async {
-              final authProvider =
-                  Provider.of<AuthProvider>(context, listen: false);
-
+              final authProvider = Provider.of<AuthProvider>(context, listen: false);
               await authProvider.logout();
-
-              // ✅ Redirigimos al login y eliminamos el historial
               Navigator.pushNamedAndRemoveUntil(
                 context,
                 AppRoutes.login,
@@ -58,6 +65,9 @@ class _HomeScreenState extends State<HomeScreen> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
+        selectedItemColor: cs.primary,
+        unselectedItemColor: cs.onSurfaceVariant,
+        backgroundColor: cs.surface,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.list),
@@ -77,7 +87,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-//Widget que muestra las tareas en el Home
 class TaskListHome extends StatelessWidget {
   const TaskListHome({super.key});
 
