@@ -86,7 +86,7 @@ class RegisterScreen extends StatelessWidget {
                         );
 
                         // Aquí más adelante guardaremos el "username" en Firestore
-                        Navigator.pushReplacementNamed(context, "/home");
+                        Navigator.pushReplacementNamed(context, "/login");
                       } catch (e) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text("Error: $e")),
