@@ -1,5 +1,6 @@
 import 'package:app_tareas_prueba/routes.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_text_field.dart';
@@ -62,15 +63,43 @@ class LoginScreen extends StatelessWidget {
                   const SizedBox(height: 30),
 
                   // Botón de iniciar sesión
-                  CustomButton(
-                    text: "Iniciar Sesión",
-                    onPressed: () {
-                      // Aquí luego se agregará la lógica con Firebase
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Iniciando sesión...")),
-                      );
-                    },
-                  ),
+                 CustomButton(
+                  text: "Iniciar Sesión",
+                  onPressed: () async {
+                    final email = emailController.text.trim();
+                    final password = passwordController.text.trim();
+
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Por favor ingresa todos los campos")),
+      );
+      return;
+    }
+
+    try {
+      // Autenticación con Firebase
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      // Si funciona, navegar a la pantalla principal
+      Navigator.pushReplacementNamed(context, AppRoutes.home);
+
+    } on FirebaseAuthException catch (e) {
+      String mensaje = "Ocurrió un error";
+      if (e.code == 'user-not-found') {
+        mensaje = "Usuario no encontrado";
+      } else if (e.code == 'wrong-password') {
+        mensaje = "Contraseña incorrecta";
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(mensaje)),
+      );
+    }
+  },
+),
                   const SizedBox(height: 20),
 
                   // Link de registro

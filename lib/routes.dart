@@ -12,7 +12,8 @@ class AppRoutes {
   // Mapeo de rutas
   static Map<String, WidgetBuilder> routes = {
     login: (context) => LoginScreen(),
-    register: (context) => const RegisterScreen(),
-    home: (context) => const HomeScreen(),
+    register: (context) => RegisterScreen(),
+    home: (context) => HomeScreen(),
   };
 }
+
