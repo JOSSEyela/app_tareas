@@ -1,54 +1,95 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/auth_provider.dart';
-import '../routes.dart';
 
-class HomeScreen extends StatelessWidget {
+import '../models/task.dart';
+import '../providers/task_provider.dart';
+import 'profile_screen.dart';
+import 'tasks_screen.dart';
+
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  int _selectedIndex = 0;
+
+  final List<Widget> _screens = [
+    const TaskListHome(), // Lista de tareas en Home
+    const TasksScreen(), // Pantalla completa de tareas
+    const ProfileScreen(), // Perfil y tema
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // 🔹 Con listen:true porque queremos redibujar si userData cambia
-    final authProvider = Provider.of<AuthProvider>(context);
-
-    // 🔹 Obtenemos el modelo de usuario
-    final userData = authProvider.userData;
-
     return Scaffold(
       appBar: AppBar(
-        title: Text("Inicio (${userData?.username ?? ''})"), // ejemplo usando username
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () async {
-              await authProvider.logout();
-
-              //Navega al login y elimina el historial
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                AppRoutes.login,
-                (route) => false,
-              );
-            },
+        title: const Text('Mi App de Tareas'),
+      ),
+      body: _screens[_selectedIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.list),
+            label: 'Inicio',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.task),
+            label: 'Tareas',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Perfil',
           ),
         ],
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              "Bienvenido ${userData?.username ?? 'Usuario'}",
-              style: const TextStyle(fontSize: 20),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              "Email: ${userData?.email ?? ''}",
-              style: const TextStyle(fontSize: 16),
-            ),
-          ],
-        ),
       ),
     );
   }
 }
+
+/// Widget que muestra las tareas en el Home
+class TaskListHome extends StatelessWidget {
+  const TaskListHome({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final taskProvider = Provider.of<TaskProvider>(context);
+
+    return StreamBuilder<List<Task>>(
+      stream: taskProvider.tasksStream,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return const Center(child: Text('No hay tareas aún.'));
+        }
+
+        final tasks = snapshot.data!;
+
+        return ListView.builder(
+          itemCount: tasks.length,
+          itemBuilder: (context, index) {
+            final task = tasks[index];
+            return ListTile(
+              title: Text(task.title),
+              subtitle: Text('Estado: ${task.status}'),
+            );
+          },
+        );
+      },
+    );
+  }
+}
+
