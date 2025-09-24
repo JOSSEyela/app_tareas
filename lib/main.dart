@@ -1,7 +1,9 @@
-import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart'; // lo generó flutterfire configure
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
+
+import 'firebase_options.dart'; // lo generó flutterfire configure
+import 'screens/auth/login_screen.dart'; // Importa la pantalla de login
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,11 +19,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false, // Quita el banner de debug
       title: 'App de Tareas',
       theme: ThemeData.light(),
       darkTheme: ThemeData.dark(),
       themeMode: ThemeMode.system,
-      home: const HomeScreen(),
+      home: LoginScreen(),
     );
   }
 }
