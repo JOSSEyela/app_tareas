@@ -9,21 +9,27 @@ class AuthProvider with ChangeNotifier {
   User? get user => _user;
 
   AuthProvider() {
+    //Escucha los cambios en la sesión de Firebase
     _authService.userChanges.listen((user) {
       _user = user;
       notifyListeners();
     });
   }
 
+  //Registrar usuario
   Future<void> register(String email, String password) async {
     await _authService.register(email, password);
   }
 
+  //Iniciar sesión
   Future<void> login(String email, String password) async {
     await _authService.login(email, password);
   }
 
+  //Cerrar sesión
   Future<void> logout() async {
     await _authService.logout();
+    _user = null; 
+    notifyListeners(); 
   }
 }
