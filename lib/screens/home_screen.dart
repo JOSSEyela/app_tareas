@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../models/task.dart';
 import '../providers/task_provider.dart';
+import '../providers/auth_provider.dart';
+import '../routes.dart';
 import 'profile_screen.dart';
 import 'tasks_screen.dart';
 
@@ -17,9 +18,9 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
 
   final List<Widget> _screens = [
-    const TaskListHome(), // Lista de tareas en Home
-    const TasksScreen(), // Pantalla completa de tareas
-    const ProfileScreen(), // Perfil y tema
+    const TaskListHome(), // Lista de tareas en el inicio
+    const TasksScreen(),  // Pantalla completa de tareas
+    const ProfileScreen(),// Perfil y configuración de tema
   ];
 
   void _onItemTapped(int index) {
@@ -33,6 +34,25 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Mi App de Tareas'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: 'Cerrar sesión',
+            onPressed: () async {
+              final authProvider =
+                  Provider.of<AuthProvider>(context, listen: false);
+
+              await authProvider.logout();
+
+              // ✅ Redirigimos al login y eliminamos el historial
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                AppRoutes.login,
+                (route) => false,
+              );
+            },
+          ),
+        ],
       ),
       body: _screens[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
@@ -57,7 +77,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-/// Widget que muestra las tareas en el Home
+//Widget que muestra las tareas en el Home
 class TaskListHome extends StatelessWidget {
   const TaskListHome({super.key});
 
@@ -92,4 +112,3 @@ class TaskListHome extends StatelessWidget {
     );
   }
 }
-
