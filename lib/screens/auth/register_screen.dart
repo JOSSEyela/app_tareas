@@ -82,6 +82,7 @@ class RegisterScreen extends StatelessWidget {
                         await authProvider.register(
                           emailController.text.trim(),
                           passwordController.text.trim(),
+                          usernameController.text.trim(),
                         );
 
                         // Aquí más adelante guardaremos el "username" en Firestore
