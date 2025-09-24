@@ -32,6 +32,25 @@
   <title>app_tareas</title>
   <link rel="manifest" href="manifest.json">
 </head>
+
+<script type="module">
+  // Importa las librerías de Firebase
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+  // Configuración de tu proyecto Firebase (te la da Firebase Console)
+  const firebaseConfig = {
+    apiKey: "AIzaSy...tuClave...",
+    authDomain: "appTareas.firebaseapp.com",
+    projectId: "appTareas",
+    storageBucket: "appTareas.appspot.com",
+    messagingSenderId: "123456789",
+    appId: "1:123456789:web:abc123",
+  };
+
+  // Inicializar Firebase
+  const app = initializeApp(firebaseConfig);
+</script>
+
 <body>
   <script src="flutter_bootstrap.js" async></script>
 </body>
